@@ -1,4 +1,5 @@
 import {el} from "../utils/dom.js";
+import {CONFIG} from "../config.js";
 const KEY="stark-spatial-content-v3";
 const CANDIDATES=".metric,.list-row,.log-line,.validation-cell,.donna-message";
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -107,8 +108,8 @@ export class SpatialContentEngine{
     if(node.closest(".spatial-group"))this.layer.append(node);
     if(node.parentElement!==this.layer)this.layer.append(node);
     node.classList.remove("docked","group-member");node.style.position="fixed";
-    let x=clamp(Math.round((point.x-90)/18)*18,18,innerWidth-Math.max(180,node.offsetWidth)-18),y=clamp(Math.round((point.y-40)/18)*18,90,innerHeight-Math.max(90,node.offsetHeight)-78);
-    for(let tries=0;tries<12;tries++){const overlap=[...this.layer.querySelectorAll(".spatial-object,.spatial-group")].some(o=>o!==node&&this.overlaps(x,y,node.offsetWidth||180,node.offsetHeight||72,o.getBoundingClientRect()));if(!overlap)break;x=clamp(x+24,18,innerWidth-210);y=clamp(y+20,90,innerHeight-130)}
+    const worldX=innerWidth*CONFIG.virtualWorldX,worldY=innerHeight*CONFIG.virtualWorldY;let x=clamp(Math.round((point.x-90)/18)*18,-worldX,innerWidth+worldX-Math.max(180,node.offsetWidth)),y=clamp(Math.round((point.y-40)/18)*18,-worldY,innerHeight+worldY-Math.max(90,node.offsetHeight));
+    for(let tries=0;tries<12;tries++){const overlap=[...this.layer.querySelectorAll(".spatial-object,.spatial-group")].some(o=>o!==node&&this.overlaps(x,y,node.offsetWidth||180,node.offsetHeight||72,o.getBoundingClientRect()));if(!overlap)break;x=clamp(x+24,-worldX,innerWidth+worldX-210);y=clamp(y+20,-worldY,innerHeight+worldY-130)}
     node.style.left=x+"px";node.style.top=y+"px";this.bus.emit("spatial:floating",{id:node.dataset.spatialId,x,y});this.autoDensity();
   }
   overlaps(x,y,w,h,r){return!(x+w+8<r.left||x>r.right+8||y+h+8<r.top||y>r.bottom+8)}
@@ -139,7 +140,7 @@ export class SpatialContentEngine{
     const node=this.focused;if(!this.beginTransform(g))return false;const t=node.__transform,ratio=clamp(g.distance/Math.max(.01,t.distance),.55,2.2),rotation=clamp(t.rotation+(g.angle-t.angle)*180/Math.PI,-28,28);
     node.style.width=Math.max(130,t.width*ratio)+"px";node.style.minHeight=Math.max(54,t.height*ratio)+"px";node.style.rotate=rotation+"deg";node.dataset.rotation=String(rotation);
     const cx=g.center.x*innerWidth,cy=g.center.y*innerHeight;node.style.position="fixed";if(node.parentElement!==this.layer)this.layer.append(node);
-    node.style.left=clamp(cx-node.offsetWidth/2,12,innerWidth-node.offsetWidth-12)+"px";node.style.top=clamp(cy-node.offsetHeight/2,76,innerHeight-node.offsetHeight-70)+"px";node.classList.add("air-transforming");return true;
+    const wx=innerWidth*CONFIG.virtualWorldX,wy=innerHeight*CONFIG.virtualWorldY;node.style.left=clamp(cx-node.offsetWidth/2,-wx,innerWidth+wx-node.offsetWidth)+"px";node.style.top=clamp(cy-node.offsetHeight/2,-wy,innerHeight+wy-node.offsetHeight)+"px";node.classList.add("air-transforming");return true;
   }
   endTransform(){const node=this.focused;if(!node)return;node.classList.remove("air-transforming");delete node.__transform;this.save()}
   trash(nodeOrId){
