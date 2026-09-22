@@ -1,6 +1,7 @@
 import {GestureClassifier} from "./GestureClassifier.js";
 import {MotionAnalyzer} from "./MotionAnalyzer.js";
 import {CONFIG} from "../config.js";
+import {DepthClickDetector} from "./DepthClickDetector.js";
 import {lerp} from "../utils/math.js";
 class GestureSmoother{
   constructor(alpha=.30){this.alpha=alpha;this.points=new Map();this.labels=new Map()}
@@ -8,7 +9,7 @@ class GestureSmoother{
   label(handId,next){const history=this.labels.get(handId)||[];history.push(next);while(history.length>5)history.shift();this.labels.set(handId,history);const counts=history.reduce((m,x)=>(m[x]=(m[x]||0)+1,m),{});return Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0]||next}
 }
 export class GestureRouter{
-  constructor(bus,roleManager){this.bus=bus;this.roles=roleManager;this.classifier=new GestureClassifier(CONFIG);this.smoother=new GestureSmoother(CONFIG.pointerSmoothing);this.motion=new MotionAnalyzer();this.prev=new Map();this.unsub=null}
+  constructor(bus,roleManager){this.bus=bus;this.roles=roleManager;this.classifier=new GestureClassifier(CONFIG);this.smoother=new GestureSmoother(CONFIG.pointerSmoothing);this.motion=new MotionAnalyzer();this.depthClick=new DepthClickDetector(bus);this.prev=new Map();this.unsub=null}
   start(){this.unsub=this.bus.on("hands:frame",frame=>this.route(frame))}
   stop(){this.unsub?.()}
   route(frame){
@@ -16,7 +17,7 @@ export class GestureRouter{
       const handedness=frame.handedness?.[index]?.[0]?.categoryName||frame.handedness?.[index]?.[0]?.displayName||`HAND-${index+1}`;
       const id=String(handedness).toLowerCase(),raw=this.classifier.classify(marks),name=this.smoother.label(id,raw.name),tip=this.smoother.point(id,{x:1-marks[8].x,y:marks[8].y});
       const motion=this.motion.push(id,tip,frame.time),role=this.roles?.roleFor(handedness)||"primary";
-      const gesture={...raw,name,tip,handId:id,handedness,role,motion,landmarks:marks,time:frame.time};this.transition(gesture);
+      const gesture={...raw,name,tip,handId:id,handedness,role,motion,landmarks:marks,worldLandmarks:frame.worldLandmarks?.[index]||null,time:frame.time};this.transition(gesture);this.depthClick.push(gesture,frame.time);
       if(motion.swipe&&["open-palm","point","victory"].includes(name))this.bus.emit(`gesture:swipe-${motion.swipe}`,gesture);
       return gesture;
     });
