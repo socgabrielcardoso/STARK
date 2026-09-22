@@ -1,0 +1,22 @@
+export const FILE_CATALOG=[
+  {name:"Security",type:"folder",icon:"🛡",children:[
+    {name:"Defender_Status.snapshot",type:"telemetry",panel:"defender"},
+    {name:"Windows_Events.snapshot",type:"telemetry",panel:"event-intel"},
+    {name:"Validation_Matrix.lab",type:"tool",panel:"validation"}
+  ]},
+  {name:"Network",type:"folder",icon:"◉",children:[
+    {name:"Connections.snapshot",type:"telemetry",panel:"connections"},
+    {name:"Network_Map.sim",type:"simulation",panel:"network"},
+    {name:"Global_Links.sim",type:"simulation",panel:"globe"}
+  ]},
+  {name:"SOC",type:"folder",icon:"⌁",children:[
+    {name:"Threat_Radar.sim",type:"simulation",panel:"radar"},
+    {name:"Live_Log_Mixer.lab",type:"tool",panel:"logs"},
+    {name:"Incident_Desk.lab",type:"tool",panel:"incidents"}
+  ]},
+  {name:"Interfaces",type:"folder",icon:"✦",children:[
+    {name:"Gesture_Lab.tool",type:"tool",panel:"gestures"},
+    {name:"Donna_AI.console",type:"tool",panel:"donna"},
+    {name:"Cyber_Command.hud",type:"tool",panel:"command"}
+  ]}
+];
