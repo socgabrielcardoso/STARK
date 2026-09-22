@@ -1,0 +1,7 @@
+import {el} from "../utils/dom.js";
+import {INCIDENTS} from "../data/incidents.js";
+export function incidentDesk(){
+  return el("div",{class:"list"},...INCIDENTS.map(i=>el("div",{class:"list-row"},
+    el("div",{class:"list-row__main"},el("strong",{},`${i.id} · ${i.title}`),el("small",{},`${i.source.toUpperCase()} · ${i.mitre||`Event ${i.eventId}`}`)),
+    el("span",{class:`badge ${i.source==="simulated"?"simulated":"real"}`},`${i.severity} / ${i.status}`))));
+}
