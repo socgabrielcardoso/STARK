@@ -1,0 +1,9 @@
+{
+  "name":"stark-cyber-command-center",
+  "version":"1.0.0",
+  "private":true,
+  "type":"module",
+  "scripts":{
+    "check":"node scripts/static-check.mjs"
+  }
+}
