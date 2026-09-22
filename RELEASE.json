@@ -1,0 +1,43 @@
+{
+  "name": "STARK Dual-Hand Spatial OS",
+  "release": "3.0.0",
+  "input": "camera-first hand interaction after browser permission",
+  "handRoles": {
+    "defaultPrimary": "Right",
+    "defaultControl": "Left",
+    "swappable": true,
+    "primary": ["target","select","open","grab","extract","move","drop","activate"],
+    "control": ["context","collapse","minimize","cancel","back","restore","reduce"],
+    "both": ["scale","translate","rotate","advanced manipulation"]
+  },
+  "spatialContent": {
+    "detachable": true,
+    "floating": true,
+    "panelContainers": true,
+    "grouping": true,
+    "recovery": true,
+    "autoSpacing": true,
+    "overlapAvoidance": true,
+    "compactPanelDock": true
+  },
+  "architecture": [
+    "Hand Tracking Engine",
+    "Hand Role Manager",
+    "Gesture Engine",
+    "Gesture State Manager",
+    "Interaction Engine",
+    "Focus Manager",
+    "Spatial Content Engine",
+    "Object Manager",
+    "Window Manager",
+    "Workspace Manager",
+    "Context Action Engine",
+    "Gesture Feedback Engine",
+    "Data Engine",
+    "Cyber Module Engine"
+  ],
+  "validationCombinations": 3072,
+  "runtime": "index.html via Live Server",
+  "storage": ["LocalStorage"],
+  "camera": "getUserMedia + MediaPipe Hand Landmarker"
+}
