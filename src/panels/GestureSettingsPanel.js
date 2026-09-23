@@ -1,6 +1,6 @@
 import {el,clear} from "../utils/dom.js";
 const KEY="stark-gesture-settings-v4";
-const defaults={smoothing:.30,pinch:.058,deadZone:.055,snap:true,precision:false,feedback:true};
+const defaults={smoothing:.27,pinch:.058,deadZone:.045,snap:true,precision:false,feedback:true};
 export class GestureSettingsPanel{
   constructor(bus){this.bus=bus;this.root=el("div",{class:"settings-grid"});this.settings=this.load();this.roles={primary:"Right",control:"Left"};bus.on("hand-role:change",r=>{this.roles=r;this.render()});this.render()}
   load(){try{return{...defaults,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch{return{...defaults}}}
@@ -12,6 +12,9 @@ export class GestureSettingsPanel{
   render(){
     clear(this.root);this.root.append(
       this.row("Hand roles",`PRIMARY ${this.roles.primary} · CONTROL ${this.roles.control}`,this.btn("SWAP",()=>this.bus.emit("hand-role:swap",{}))),
+      this.row("Hybrid input","HANDS PRIMARY · MOUSE READY"),
+      this.row("Forward click","3 DEPTH PULSES"),
+      this.row("Far-hand assist","AUTO ZOOM"),
       this.row("Pointer smoothing",this.settings.smoothing,this.btn("−",()=>this.adjust("smoothing",-.02,.12,.5)),this.btn("+",()=>this.adjust("smoothing",.02,.12,.5))),
       this.row("Pinch threshold",this.settings.pinch,this.btn("−",()=>this.adjust("pinch",-.003,.03,.09)),this.btn("+",()=>this.adjust("pinch",.003,.03,.09))),
       this.row("Dead zone",this.settings.deadZone,this.btn("−",()=>this.adjust("deadZone",-.005,.02,.12)),this.btn("+",()=>this.adjust("deadZone",.005,.02,.12))),
