@@ -12,7 +12,8 @@ const required=[
   "src/interaction/HandRoleManager.js","src/interaction/FocusManager.js","src/interaction/SpatialContentEngine.js","src/interaction/CompactPanelDock.js",
   "src/interaction/InteractionEngine.js","src/interaction/ObjectManager.js","src/interaction/WindowManager.js","src/interaction/PanelManager.js",
   "src/interaction/WorkspaceController.js","src/interaction/WorkspacePersistence.js","src/interaction/ContextActionEngine.js","src/interaction/ContextResolver.js",
-  "src/interaction/GestureFeedbackEngine.js","src/interaction/HandOnlyGuard.js",
+  "src/interaction/GestureFeedbackEngine.js","src/interaction/HybridInputManager.js","src/interaction/MouseInteractionController.js","src/interaction/ActivationRouter.js",
+  "src/ui/InfoLens.js","src/ui/OffscreenNavigator.js","src/ui/DepthClickFeedback.js","src/vision/DepthClickDetector.js","src/core/PerformanceGovernor.js",
   "src/panels/PanelRegistry.js","src/panels/InvestigationBoard.js","src/panels/TimelinePanel.js","src/panels/GestureSettingsPanel.js",
   "src/data/realTelemetry.js","src/data/simulatedTelemetry.js","src/data/DataEngine.js"
 ];
@@ -37,14 +38,14 @@ const router=fs.readFileSync(path.join(root,"src/vision/GestureRouter.js"),"utf8
 const pointer=fs.readFileSync(path.join(root,"src/vision/PointerController.js"),"utf8");
 const spatial=fs.readFileSync(path.join(root,"src/interaction/SpatialContentEngine.js"),"utf8");
 const html=fs.readFileSync(path.join(root,"index.html"),"utf8");
-if(/addEventListener\s*\(\s*["']keydown["']/.test(main))errors.push("keyboard control listener detected in main.js");
+
 if(/CommandPalette|ImportDrawer|TelemetryInspector/.test(main))errors.push("legacy mouse/keyboard UI controller detected in main.js");
-for(const token of ["HandOnlyGuard","GestureEngine","CalibrationEngine","HandRoleManager","FocusManager","SpatialContentEngine","CompactPanelDock"])if(!main.includes(token))errors.push(`missing main wiring: ${token}`);
-if(!router.includes('roleManager')||!router.includes('roleFor('))errors.push("gesture router is not role-aware");
+for(const token of ["HybridInputManager","MouseInteractionController","ActivationRouter","InfoLens","OffscreenNavigator","DepthClickFeedback","PerformanceGovernor","GestureEngine","CalibrationEngine","HandRoleManager","FocusManager","SpatialContentEngine","CompactPanelDock"])if(!main.includes(token))errors.push(`missing main wiring: ${token}`);
+if(!router.includes("DepthClickDetector")||!router.includes("roleFor("))errors.push("gesture router is not role-aware or depth-click enabled");
 if(!pointer.includes('g.role!=="primary"'))errors.push("pointer does not enforce primary-hand selection");
 if(!spatial.includes("panel-spatial-slot")||!spatial.includes("spatial-source-detached"))errors.push("detachable spatial content engine incomplete");
-if(!html.includes("styles/hand-only.css"))errors.push("hand-only stylesheet not linked");
+if(!html.includes("styles/hand-only.css"))errors.push("spatial interaction stylesheet not linked");
 if(!html.includes('id="webcam"'))errors.push("webcam element missing");
 
 if(errors.length){console.error("STARK checks failed\n"+errors.map(x=>" - "+x).join("\n"));process.exit(1)}
-console.log(`STARK checks passed · dual-hand roles · detachable spatial content · ${required.length} architecture files · ${VALIDATION_COMBINATIONS} validation permutations · ${COMPOSITION_CAPACITY.toLocaleString()} composable gesture contexts`);
+console.log(`STARK checks passed · hybrid input · far-hand tracking · triple-depth click · detachable spatial content · ${required.length} architecture files · ${VALIDATION_COMBINATIONS} validation permutations · ${COMPOSITION_CAPACITY.toLocaleString()} composable gesture contexts`);
