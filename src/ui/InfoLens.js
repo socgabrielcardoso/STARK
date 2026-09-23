@@ -28,7 +28,7 @@ export class InfoLens{
     const source=this.current?.node;if(!source)return;
     const r=source.getBoundingClientRect(),point={x:Math.min(innerWidth-80,Math.max(80,r.left+r.width/2)),y:Math.min(innerHeight-80,Math.max(80,r.top+r.height/2))};
     const payload={type:"spatial",entityType:this.current.type.toLowerCase(),id:this.current.id,name:this.current.title};
-    this.spatial?.promote(source,payload,point,document.elementFromPoint(point.x,point.y));this.bus.emit("info:floated",{id:this.current.id});this.close();
+    if(this.spatial){this.spatial.beginGrab(source,payload,point);this.spatial.moveGrab({x:Math.min(innerWidth-120,point.x+90),y:Math.min(innerHeight-90,point.y+60)});this.spatial.endGrab({x:Math.min(innerWidth-120,point.x+90),y:Math.min(innerHeight-90,point.y+60)},null)}this.bus.emit("info:floated",{id:this.current.id});this.close();
   }
   focus(){this.current?.node?.classList.add("object-selected");this.current?.node?.scrollIntoView?.({block:"nearest",inline:"nearest",behavior:"smooth"});this.bus.emit("info:focused",{id:this.current?.id})}
   close(){this.node?.classList.remove("visible");this.current=null;this.bus.emit("info:hidden",{})}
