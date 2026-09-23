@@ -1,41 +1,50 @@
 {
-  "name": "STARK Dual-Hand Spatial OS",
-  "release": "3.0.0",
-  "input": "camera-first hand interaction after browser permission",
+  "name": "STARK Hybrid Spatial OS",
+  "release": "4.0.0",
+  "input": "hands-first hybrid interaction with optional mouse",
   "handRoles": {
     "defaultPrimary": "Right",
     "defaultControl": "Left",
     "swappable": true,
-    "primary": ["target","select","open","grab","extract","move","drop","activate"],
+    "primary": ["target","select","open","grab","extract","move","drop","activate","triple-forward-click"],
     "control": ["context","collapse","minimize","cancel","back","restore","reduce"],
     "both": ["scale","translate","rotate","advanced manipulation"]
+  },
+  "mouse": {
+    "enabled": true,
+    "required": false,
+    "supports": ["click","inspect","drag","panel move","panel resize","double-click open/maximize"]
+  },
+  "farHandTracking": {
+    "highResolutionCapture": true,
+    "normalizedGestures": true,
+    "adaptiveCenterZoomRecovery": true,
+    "lowConfidenceRecovery": true
+  },
+  "depthClick": {
+    "gesture": "pointing index finger pushed forward three times",
+    "pulses": 3,
+    "worldSpaceDepth": true,
+    "visualProgress": true
   },
   "spatialContent": {
     "detachable": true,
     "floating": true,
+    "canLeaveViewport": true,
+    "offscreenNavigator": true,
     "panelContainers": true,
     "grouping": true,
     "recovery": true,
     "autoSpacing": true,
     "overlapAvoidance": true,
-    "compactPanelDock": true
+    "compactPanelDock": true,
+    "clickInspector": true
   },
-  "architecture": [
-    "Hand Tracking Engine",
-    "Hand Role Manager",
-    "Gesture Engine",
-    "Gesture State Manager",
-    "Interaction Engine",
-    "Focus Manager",
-    "Spatial Content Engine",
-    "Object Manager",
-    "Window Manager",
-    "Workspace Manager",
-    "Context Action Engine",
-    "Gesture Feedback Engine",
-    "Data Engine",
-    "Cyber Module Engine"
-  ],
+  "performance": {
+    "adaptiveVisualGovernor": true,
+    "eventDrivenOffscreenNavigation": true,
+    "compactDensity": true
+  },
   "validationCombinations": 3072,
   "runtime": "index.html via Live Server",
   "storage": ["LocalStorage"],
