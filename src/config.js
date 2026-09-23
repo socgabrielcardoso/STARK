@@ -9,6 +9,6 @@ export const CONFIG = Object.freeze({
   depthClickPulses:3,depthClickWindowMs:1450,depthClickPulseThreshold:.115,depthClickCooldownMs:620,
   virtualWorldX:.82,virtualWorldY:.68,offscreenRevealMargin:42,
   simulationTickMs:1000,validationTarget:3072,defaultWorkspace:"COMMAND",
-  handModelUrl:"https://storage.googleapis.com/mediapi-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task".replace("mediapi-models","mediapipe-models"),
+  handModelUrl:"https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
   visionWasmUrl:"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
 });
