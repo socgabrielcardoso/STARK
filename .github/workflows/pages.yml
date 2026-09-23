@@ -1,4 +1,4 @@
-name: Deploy STARK to GitHub Pages
+name: Verify STARK and optionally deploy Pages
 
 on:
   push:
@@ -25,6 +25,7 @@ jobs:
       - run: npm run check
 
   deploy:
+    if: github.event_name == 'workflow_dispatch'
     needs: verify
     environment:
       name: github-pages
