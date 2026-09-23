@@ -108,7 +108,7 @@ export class SpatialContentEngine{
     if(node.closest(".spatial-group"))this.layer.append(node);
     if(node.parentElement!==this.layer)this.layer.append(node);
     node.classList.remove("docked","group-member");node.style.position="fixed";
-    const worldX=innerWidth*CONFIG.virtualWorldX,worldY=innerHeight*CONFIG.virtualWorldY;let x=clamp(Math.round((point.x-90)/18)*18,-worldX,innerWidth+worldX-Math.max(180,node.offsetWidth)),y=clamp(Math.round((point.y-40)/18)*18,-worldY,innerHeight+worldY-Math.max(90,node.offsetHeight));
+    const worldX=innerWidth*CONFIG.virtualWorldX,worldY=innerHeight*CONFIG.virtualWorldY;let x=clamp(Math.round((point.x-90)/18)*18,-worldX,innerWidth+worldX-Math.max(180,node.offsetWidth)),y=clamp(Math.round((point.y-40)/18)*18,-worldY,innerHeight+worldY-Math.max(90,node.offsetHeight));const edge=26;if(point.x<edge)x=-Math.max(90,node.offsetWidth)-54;else if(point.x>innerWidth-edge)x=innerWidth+54;if(point.y<edge)y=-Math.max(70,node.offsetHeight)-40;else if(point.y>innerHeight-edge)y=innerHeight+40;
     for(let tries=0;tries<12;tries++){const overlap=[...this.layer.querySelectorAll(".spatial-object,.spatial-group")].some(o=>o!==node&&this.overlaps(x,y,node.offsetWidth||180,node.offsetHeight||72,o.getBoundingClientRect()));if(!overlap)break;x=clamp(x+24,-worldX,innerWidth+worldX-210);y=clamp(y+20,-worldY,innerHeight+worldY-130)}
     node.style.left=x+"px";node.style.top=y+"px";this.bus.emit("spatial:floating",{id:node.dataset.spatialId,x,y});this.autoDensity();
   }
