@@ -1,17 +1,23 @@
 import {EventBus} from "./core/EventBus.js";
 import {TelemetryEngine} from "./core/TelemetryEngine.js";
+import {PerformanceGovernor} from "./core/PerformanceGovernor.js";
 import {HudShell} from "./ui/HudShell.js";
 import {Toast} from "./ui/Toast.js";
 import {HandStatusHUD} from "./ui/HandStatusHUD.js";
 import {CalibrationOverlay} from "./ui/CalibrationOverlay.js";
 import {LayerIndicator} from "./ui/LayerIndicator.js";
+import {InfoLens} from "./ui/InfoLens.js";
+import {OffscreenNavigator} from "./ui/OffscreenNavigator.js";
+import {DepthClickFeedback} from "./ui/DepthClickFeedback.js";
 import {PanelManager} from "./interaction/PanelManager.js";
 import {WorkspaceController} from "./interaction/WorkspaceController.js";
 import {SpatialLayout} from "./interaction/SpatialLayout.js";
 import {ActionHistory} from "./interaction/ActionHistory.js";
 import {WindowManager} from "./interaction/WindowManager.js";
 import {WorkspacePersistence} from "./interaction/WorkspacePersistence.js";
-import {HandOnlyGuard} from "./interaction/HandOnlyGuard.js";
+import {HybridInputManager} from "./interaction/HybridInputManager.js";
+import {MouseInteractionController} from "./interaction/MouseInteractionController.js";
+import {ActivationRouter} from "./interaction/ActivationRouter.js";
 import {InteractionEngine} from "./interaction/InteractionEngine.js";
 import {ObjectManager} from "./interaction/ObjectManager.js";
 import {ContextActionEngine} from "./interaction/ContextActionEngine.js";
@@ -47,6 +53,7 @@ new HandStatusHUD(bus).mount(hudRoot);
 new CalibrationOverlay(bus).mount(hudRoot);
 new LayerIndicator(bus).mount(hudRoot);
 new GestureFeedbackEngine(bus).mount(hudRoot);
+new DepthClickFeedback(bus).mount(hudRoot);
 const airMenu=new AirMenu(bus);airMenu.mount(hudRoot);
 
 const history=new ActionHistory(bus);
@@ -70,13 +77,19 @@ const relations=new RelationEngine(bus);relations.mount(appRoot);
 const cyber=new CyberModuleEngine(bus).seed();
 const dataEngine=new DataEngine(bus);
 const telemetry=new TelemetryEngine(bus);
-const handGuard=new HandOnlyGuard(bus);
+const inputManager=new HybridInputManager(bus);inputManager.start();
+const performanceGovernor=new PerformanceGovernor(bus);performanceGovernor.start();
+const infoLens=new InfoLens({bus,root:hudRoot,spatial});infoLens.mount();
+const offscreenNavigator=new OffscreenNavigator({bus,root:hudRoot,spatial});offscreenNavigator.mount();
+const activation=new ActivationRouter({bus,contextResolver,panelManager:pm,infoLens});
+const mouse=new MouseInteractionController({bus,panelManager:pm,spatial,activation,layer});mouse.start();
 
 const renderer=new HandRenderer(document.querySelector("#hand-layer"),bus);renderer.start();
 const router=new GestureRouter(bus,roles);router.start();
 const gestureEngine=new GestureEngine(bus);gestureEngine.start();
 const pointer=new PointerController({bus,panelManager:pm,cursor:document.querySelector("#gesture-cursor"),layer,contextResolver,precision,spatial,focus});pointer.start();
 const calibration=new CalibrationEngine(bus);
+bus.on("gesture:depth-triple-click",g=>activation.at({x:g.tip.x*innerWidth,y:g.tip.y*innerHeight},{source:"depth-triple"}));
 
 const quickModules=[
   ["command","◎","COMMAND"],["files","▱","FILES"],["investigation","⌁","INVESTIGATE"],
@@ -186,7 +199,7 @@ bus.on("telemetry:update",s=>{
   ]);spatial.decorateAll();
 });
 
-window.STARK={bus,telemetry,workspace,panels:registry.panels,modules:registry.modules,history,windowManager,persistence,interaction,objects,contextActions,relations,layerManager,gestureEngine,calibration,cyber,dataEngine,precision,roles,focus,spatial,compactDock};
+window.STARK={bus,telemetry,workspace,panels:registry.panels,modules:registry.modules,history,windowManager,persistence,interaction,objects,contextActions,relations,layerManager,gestureEngine,calibration,cyber,dataEngine,precision,roles,focus,spatial,compactDock,inputManager,mouse,activation,infoLens,offscreenNavigator,performanceGovernor};
 
 bus.emit("hand-role:change",roles.snapshot());
 telemetry.start();
@@ -195,7 +208,7 @@ let tracking=null,starting=false;
 async function initializeCamera(){
   if(starting||tracking)return;starting=true;const boot=document.querySelector("#boot-screen"),button=document.querySelector("#boot-button"),status=document.querySelector("#boot-status");
   if(button){button.disabled=true;button.textContent="REQUESTING CAMERA…"}if(status)status.textContent="Allow camera access once. Primary and control hand roles will appear automatically.";
-  try{tracking=new HandTracking({video:document.querySelector("#webcam"),bus});await tracking.init();await tracking.start();handGuard.start();if(boot)boot.classList.add("hidden");persistence.start();calibration.start();toast.show("STARK DUAL-HAND OS · CALIBRATING")}
+  try{tracking=new HandTracking({video:document.querySelector("#webcam"),bus});await tracking.init();await tracking.start();if(boot)boot.classList.add("hidden");persistence.start();calibration.start();toast.show("STARK DUAL-HAND OS · CALIBRATING")}
   catch(error){console.error(error);tracking=null;starting=false;if(button){button.disabled=false;button.textContent="ALLOW CAMERA + START"}if(status)status.textContent="Camera permission is required. The startup button is only for browser permission."}
 }
 document.querySelector("#boot-button")?.addEventListener("click",initializeCamera);queueMicrotask(()=>initializeCamera());
@@ -205,4 +218,4 @@ bus.on("calibration:complete",()=>{
   layerManager.active=1;bus.emit("layer:change",{layer:1,name:"PRIMARY",restored:Boolean(restored)});bus.emit("hand-role:change",roles.snapshot());spatial.decorateAll();toast.show(restored?"WORKSPACE RESTORED":"COMMAND WORKSPACE READY");
 });
 
-addEventListener("beforeunload",()=>{persistence.save();spatial.save();tracking?.stop();telemetry.stop();renderer.stop();router.stop();handGuard.stop()});
+addEventListener("beforeunload",()=>{persistence.save();spatial.save();tracking?.stop();telemetry.stop();renderer.stop();router.stop();mouse.stop();inputManager.stop();offscreenNavigator.stop()});
