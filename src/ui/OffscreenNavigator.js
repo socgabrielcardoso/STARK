@@ -1,9 +1,11 @@
 import {el,clear} from "../utils/dom.js";
 export class OffscreenNavigator{
-  constructor({bus,root,spatial}){this.bus=bus;this.root=root;this.spatial=spatial;this.node=null;this.raf=0}
+  constructor({bus,root,spatial}){this.bus=bus;this.root=root;this.spatial=spatial;this.node=null;this.timer=null}
   mount(){
     this.node=el("aside",{class:"offscreen-navigator","aria-label":"Offscreen objects"});this.root.append(this.node);
-    const tick=()=>{this.render();this.raf=requestAnimationFrame(tick)};tick();return this.node;
+    const refresh=()=>this.render();this.timer=setInterval(refresh,320);
+    ["spatial:drop","spatial:floating","spatial:grouped","spatial:restored","spatial:trashed","workspace:change"].forEach(name=>this.bus.on(name,refresh));
+    addEventListener("resize",refresh);refresh();return this.node;
   }
   render(){
     const out=[...document.querySelectorAll(".spatial-object-layer > .spatial-object,.spatial-object-layer > .spatial-group")].filter(n=>this.isOutside(n.getBoundingClientRect()));
@@ -15,17 +17,17 @@ export class OffscreenNavigator{
       b.addEventListener("click",()=>this.reveal(node,edge));this.node.append(b)
     })
   }
-  isOutside(r){return r.right<16||r.left>innerWidth-16||r.bottom<72||r.top>innerHeight-16}
+  isOutside(r){return r.right<16||r.left>innerWidth-16||r.bottom<64||r.top>innerHeight-16}
   edge(r){
     const cx=r.left+r.width/2,cy=r.top+r.height/2;
-    if(cx<0)return{icon:"←",x:70,y:Math.min(innerHeight-120,Math.max(100,cy))};
-    if(cx>innerWidth)return{icon:"→",x:innerWidth-250,y:Math.min(innerHeight-120,Math.max(100,cy))};
-    if(cy<70)return{icon:"↑",x:Math.min(innerWidth-250,Math.max(70,cx)),y:100};
-    return{icon:"↓",x:Math.min(innerWidth-250,Math.max(70,cx)),y:innerHeight-170}
+    if(cx<0)return{icon:"←",x:64,y:Math.min(innerHeight-110,Math.max(76,cy))};
+    if(cx>innerWidth)return{icon:"→",x:innerWidth-230,y:Math.min(innerHeight-110,Math.max(76,cy))};
+    if(cy<64)return{icon:"↑",x:Math.min(innerWidth-230,Math.max(64,cx)),y:76};
+    return{icon:"↓",x:Math.min(innerWidth-230,Math.max(64,cx)),y:innerHeight-150}
   }
   reveal(node,edge){
-    node.style.position="fixed";node.style.left=Math.max(18,edge.x)+"px";node.style.top=Math.max(78,edge.y)+"px";node.classList.add("offscreen-return");
-    setTimeout(()=>node.classList.remove("offscreen-return"),260);this.spatial.focused=node;this.spatial.save();this.bus.emit("spatial:revealed",{id:node.dataset.spatialId||node.dataset.spatialGroup})
+    node.style.position="fixed";node.style.left=Math.max(12,edge.x)+"px";node.style.top=Math.max(62,edge.y)+"px";node.classList.add("offscreen-return");
+    setTimeout(()=>node.classList.remove("offscreen-return"),240);this.spatial.focused=node;this.spatial.save();this.bus.emit("spatial:revealed",{id:node.dataset.spatialId||node.dataset.spatialGroup})
   }
-  stop(){cancelAnimationFrame(this.raf)}
+  stop(){clearInterval(this.timer)}
 }
