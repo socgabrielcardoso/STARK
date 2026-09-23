@@ -1,1 +1,10 @@
-@media (max-width:900px){.topbar__center{display:none}.gesture-status{display:none}.panel-layer{inset:78px 8px 72px}.hud-panel{min-width:220px}}@media (max-width:620px){:root{--topbar-h:52px}.topbar{left:8px;right:8px;top:8px}.brand small{display:none}.brand strong{font-size:10px}.topbar__right .badge{display:none}.panel-layer{top:68px}.hud-panel{width:calc(100vw - 16px)!important;left:0!important;max-width:none}.command-dock{bottom:10px;max-width:calc(100vw - 16px);overflow-x:auto}.dock-btn{min-width:38px;width:38px;height:38px}.metric strong{font-size:17px}}
+@media (max-width:900px){
+  .topbar__center{display:none}.gesture-status{display:none}.panel-layer{inset:58px 6px 58px}.hud-panel{min-width:205px}
+  .info-lens{width:min(320px,42vw);right:8px;top:62px}.hand-status-hud__legend{display:none}
+}
+@media (max-width:620px){
+  :root{--topbar-h:42px}.topbar{left:6px;right:6px;top:6px}.brand small{display:none}.brand strong{font-size:9px}.topbar__right .badge{display:none}
+  .panel-layer{top:54px}.hud-panel{width:calc(100vw - 12px)!important;left:0!important;max-width:none}.command-dock{bottom:7px;max-width:calc(100vw - 12px);overflow-x:auto}
+  .dock-btn{min-width:31px;width:31px;height:31px}.metric strong{font-size:14px}.info-lens{left:8px;right:8px;top:auto;bottom:48px;width:auto;max-height:42vh}
+  .offscreen-navigator{bottom:44px;max-width:90vw}.hand-status-hud{top:52px}
+}
