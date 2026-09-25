@@ -1,9 +1,19 @@
 {
-  "name":"stark-cyber-command-center",
-  "version":"1.0.0",
-  "private":true,
-  "type":"module",
-  "scripts":{
-    "check":"node scripts/static-check.mjs"
-  }
+  "name": "stark-cyber-command-center",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/static-check.mjs"
+  },
+  "description": "Experimental spatial interface driven by real-time hand tracking, gesture controls and optional mouse interaction.",
+  "author": "Gabriel de Lima Cardoso",
+  "keywords": [
+    "computer-vision",
+    "hand-tracking",
+    "gestures",
+    "spatial-ui",
+    "hci",
+    "javascript"
+  ]
 }
